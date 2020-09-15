@@ -1,5 +1,9 @@
 ## 第七章 类
 
+**声明:**
+本文为《C++ Primer 中文版（第五版）》学习笔记。
+原书更为详细，本文仅作学习交流使用。
+
 P228-P273
 
 类的基本思想是数据抽象和封装。
@@ -186,8 +190,126 @@ class Screen {
 }
 ```
 
+### 7.3 类的其他特性
+
+（1）重载成员变量
+
+```c++
+Screen myScrren;
+char ch = myScreen.get();
+ch = myScreen.get(0,0);
+```
+
+（2）类数据成员的初始化
+
+类内初始值必须使用=或者{}的初始化形式。
+
+```c++
+class Window_mgr{
+private:
+    std::vector<Screen> screens{Screen(24, 80, ' ')};
+}
+```
+
+（3）基于const的重载
+
+```c++
+class Screen {
+public:
+	// display overloaded on whether the object is const or not
+    Screen &display(std::ostream &os) 
+                  { do_display(os); return *this; }
+    const Screen &display(std::ostream &os) const
+                  { do_display(os); return *this; }
+}
+```
+
+当某个对象调用display的时候，该对象是否是const决定了应该调用display的哪个版本。
+
+（3）类类型
+
+对于一个类来说，在我们创建他的对象之前该类必须被定义过，而不能仅被声明。
+
+（4）友元
+
+*友元类*
+
+如果一个类指定了友元类，则友元类的成员函数可以访问此类包括非公有成员在内的所有成员。
+
+```c++
+class Screen {
+	// Window_mgr的成员可以访问Screen类的私有部分
+	friend class Window_mgr;
+}
+```
+
+*令成员函数作为友元*
+
+```
+class Screen {
+	// Window_mgr::clear必须在Screen类之前被声明
+	friend void Window_mgr::clear(ScreenIndex);
+}
+```
+
 ### 7.4 类的作用域
+
+一个类就是一个作用域。
 
 ### 7.5 构造函数再探
 
+（1）构造函数的初始值有时必不可少
+
+::: tip
+
+如果成员是const、引用，或者属于某种未提供默认构造函数的类类型化。我们必须通过构造函数初始值列表为这些成员提供初值。
+
+:::
+
+```cpp
+class ConstRef{
+public:
+	ConstRef (int i);
+private:
+	int i;
+	const int ci;
+	int &ri;
+};
+
+ConstRef:ConstRef(int ii) : i(ii), ci(ii), ri(i){  }
+```
+
+（2）成员初始化的顺序
+
+成员初始化的顺序与它们在类定义中出现 的顺序一致。P259
+
+（3）委托构造函数
+
+使用它所述类的其他构造函数执行它自己的初始化过程。
+
+（4）如果去抑制构造函数定义的隐式转换？
+
+在类内声明构造函数的时候使用explicit关键字。
+
 ### 7.6 类的静态成员
+
+（1）声明静态成员
+
+在成员的声明之前加上关键词static。
+
+类的静态成员存在于任何对象之外，对象中不包含任何与静态成员有关的数据。
+
+（2）使用类的静态成员
+
+```cpp
+double r;
+r = Account::rate();
+```
+
+### 小结
+
+类有两项基本能力：
+
+一是数据数据抽象，即定义数据成员和函数成员的能力；
+
+二是封装，即保护类的成员不被随意访问的能力。
